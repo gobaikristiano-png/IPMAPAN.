@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Gobai Kristiano" />
+    <title>
+        IPMAPAN - Ikatan Pelajar dan Mahasiswa/i Paniai Kota Studi Semarang & Salatiga
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* --- Gaya Umum (Global Styles) --- */
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #000000;
+            /* overflow-x: hidden; - Sudah tidak digunakan, baik */
+        }
+        /* --- Gaya untuk Layar Selamat Datang (Welcome Screen) --- */
+        
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("bg.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+            overflow: hidden;
+            /* Pastikan tidak ada scroll di welcome screen */
+        }
+        
+        #welcome-screen::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        #welcome-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #welcome-screen h1 {
+            font-size: clamp(0.2rem, 6vw, 4rem);
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            color: #fff;
+            position: relative;
+            z-index: 1;
+            padding: 0 10px;
+        }
+        
+        #welcome-screen p {
+            font-size: clamp(1rem, 2.8vw, 1.8rem);
+            margin-bottom: 40px;
+            max-width: 90%;
+            line-height: 1.5;
+            color: #eee;
+            position: relative;
+            z-index: 1;
+            padding: 0 15px;
+        }
+        
+        #welcome-screen button {
+            background-color: #003e07;
+            color: white;
+            border: 2px solid #784906;
+            padding: 18px 40px;
+            font-size: 1.3em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #welcome-screen button:hover {
+            background-color: #4273a7;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        /* --- Gaya untuk Konten Utama Situs (#main-content) --- */
+        
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.2s ease-in;
+            display: block;
+            /* Menjaga elemen sebagai blok */
+            min-height: 100vh;
+            position: relative;
+            z-index: 5;
+            background-image: url("bg2.jpg");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        #main-content.visible {
+            opacity: 1;
+        }
+        
+        main {
+            padding: 2rem;
+            max-width: 1000px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            min-height: 50vh;
+            /* Memberikan ruang di bagian bawah konten utama */
+            padding-bottom: 2rem;
+        }
+        
+        header {
+            background-color: #024511;
+            color: #ffffff;
+            padding: 1rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo {
+            max-height: 350px;
+            width: auto;
+            display: block;
+            margin: 0 auto 0.5rem auto;
+        }
+        
+        header h1 {
+            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            margin: 0.5rem 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        header p {
+            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            margin: 0.5rem 0;
+            text-transform: capitalize;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        nav {
+            background: #4b3621;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+        
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease, color 0.3s ease;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            cursor: pointer;
+            /* Menambahkan cursor pointer untuk tautan navigasi */
+        }
+        
+        nav a:hover {
+            background-color: #d7b89c;
+            color: #000;
+        }
+        /* --- Gaya untuk Efek Muncul Satu Per Satu (sections) --- */
+        
+        section {
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        section.show-section {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* --- Akhir Gaya untuk Efek Muncul Satu Per Satu (sections) --- */
+        
+        footer {
+            background-color: #0c6f0a;
+            color: white;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+            line-height: 1.8;
+        }
+        
+        ul.sub-list {
+            padding-left: 1.2rem;
+        }
+        
+        h2 {
+            text-transform: capitalize;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 0.3rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+        }
+        
+        .galeri-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .galeri-container img {
+            width: 100%;
+            height: 160px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .galeri-container img:hover {
+            transform: scale(1.05);
+        }
+        /* --- Gaya untuk elemen yang akan dianimasikan saat scroll --- */
+        
+        .initial-hidden {
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        /* Kondisi awal untuk slide (hanya aktif di desktop) */
+        
+        .initial-hidden.slide-from-left {
+            transform: translateX(-50px);
+        }
+        
+        .initial-hidden.slide-from-right {
+            transform: translateX(50px);
+        }
+        /* Kondisi akhir (terlihat) */
+        
+        .is-visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        /* --- Akhir Gaya untuk elemen yang akan dianimasikan saat scroll --- */
+        /* --- PERBAIKAN UNTUK PROFILE PIC --- */
+        
+        #profil .profile-item {
+            margin-bottom: 2rem;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+            display: block;
+        }
+        
+        #profil .profile-item p {
+            flex: 1;
+        }
+        /* --- Responsifitas (Media Queries) --- */
+        /* Breakpoint untuk Tablet & Mobile Lebih Besar (hingga 768px) */
+        
+        @media (max-width: 768px) {
+            #welcome-screen h1 {
+                font-size: clamp(2rem, 5vw, 3rem);
+            }
+            #welcome-screen p {
+                font-size: clamp(1rem, 2.5vw, 1.5rem);
+                max-width: 90%;
+            }
+            #welcome-screen button {
+                padding: 14px 30px;
+                font-size: 1.1em;
+            }
+            header h1 {
+                font-size: clamp(1.6rem, 4.5vw, 2.5rem);
+            }
+            header p {
+                font-size: clamp(0.8rem, 1.2vw, 1rem);
+            }
+            .logo {
+                max-height: 180px;
+            }
+            nav {
+                flex-direction: column;
+                gap: 0;
+                padding: 0.5rem 0;
+            }
+            nav a {
+                padding: 0.8rem 1rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+            nav a:last-child {
+                border-bottom: none;
+            }
+            main {
+                padding: 1.5rem;
+            }
+            /* Animasi slide di mobile, gunakan transformY agar lebih halus */
+            .initial-hidden.slide-from-left,
+            .initial-hidden.slide-from-right {
+                transform: translateY(20px);
+            }
+            .is-visible {
+                transform: translateY(0);
+            }
+            /* Ukuran font umum untuk teks di mobile */
+            body {
+                font-size: 16px;
+            }
+            h2 {
+                font-size: clamp(1.4rem, 5vw, 1.8rem);
+            }
+            ul.sub-list {
+                padding-left: 1rem;
+            }
+            /* Profile items stack in mobile */
+            #profil .profile-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            .profile-pic {
+                margin-bottom: 1rem;
+            }
+        }
+        /* Breakpoint tambahan untuk Mobile Sangat Kecil (hingga 480px) */
+        
+        @media (max-width: 480px) {
+            #welcome-screen h1 {
+                font-size: clamp(1.6rem, 7vw, 2.5rem);
+            }
+            #welcome-screen p {
+                font-size: clamp(0.9rem, 3.5vw, 1.2rem);
+            }
+            #welcome-screen button {
+                padding: 12px 25px;
+                font-size: 0.9em;
+            }
+            header {
+                min-height: 35vh;
+                padding: 0.5rem;
+            }
+            header h1 {
+                font-size: clamp(1.4rem, 6vw, 2rem);
+            }
+            header p {
+                font-size: clamp(0.75rem, 3.5vw, 0.9rem);
+            }
+            .logo {
+                max-height: 120px;
+            }
+            main {
+                padding: 0.8rem;
+            }
+            footer {
+                padding: 1rem 0.5rem;
+                font-size: 0.75rem;
+            }
+            .galeri-container {
+                grid-template-columns: 1fr;
+            }
+            .galeri-container img {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="welcome-screen">
+        <h1>SELAMAT DATANG DI WEB RESMI IPMAPAN</h1>
+        <p>
+            IKATAN PELAJAR DAN MAHASISWA/I PANIAI KOTA STUDI SEMARANG DAN SALATIGA
+        </p>
+        <button id="enter-button">Masuk ke Situs</button>
+    </div>
+
+    <div id="main-content">
+        <header>
+            <img src="logo.png" alt="Logo IPMAPAN" class="logo" />
+            <h1>IPMAPAN</h1>
+            <p>
+                IKATAN PELAJAR DAN MAHASISWA / I PANIAI KOTA STUDI SEMARANG DAN SALATIGA
+            </p>
+        </header>
+
+        <nav>
+            <a href="#beranda">Beranda</a>
+            <a href="#tentang">Tentang Kami</a>
+            <a href="#profil">Profil Inti Pengurus</a>
+            <a href="#pengurus">Struktur Pengurus</a>
+            <a href="#kegiatan">Kegiatan</a>
+            <a href="#galeri">Galeri kegiatan</a>
+            <a href="#galeri-kami">Galeri Kami</a>
+            <a href="#kontak">Kontak</a>
+        </nav>
+
+        <main>
+            <section id="tentang">
+                <h2>Tentang kami</h2>
+                <p>
+                    Kami adalah pelajar dan mahasiswa/i Paniai, Papua Tengah, yang saat ini tengah menimba ilmu di tanah rantau, khususnya di Jawa Tengah, dengan konsentrasi di kota-kota pendidikan seperti Semarang dan Salatiga. Kami berkumpul dalam satu wadah kebersamaan
+                    yang kami namakan Ikatan Pelajar dan Mahasiswa/i Paniswa (IPMAPAN). Organisasi ini bukan sekadar perkumpulan biasa, melainkan rumah kedua bagi kami yang jauh dari keluarga dan kampung halaman. Tujuan utama IPMAPAN adalah mengsukseskan
+                    setiap cita-cita dan impian anggota kami masing-masing. Kami percaya bahwa pendidikan adalah kunci kemajuan, dan melalui solidaritas yang kuat, kami dapat saling mendukung, berbagi ilmu, dan melewati berbagai tantangan akademik maupun
+                    non-akademik. Setiap langkah yang kami ambil di perantauan ini, setiap ilmu yang kami serap, dan setiap pengalaman yang kami dapatkan, semuanya bermuara pada satu harapan besar: memberikan kontribusi terbaik bagi kemajuan Kabupaten
+                    Paniai dan kampung halaman kami tercinta. Melalui IPMAPAN, kami bertekad untuk menjadi generasi penerus yang cerdas, berdaya saing, dan berkarakter, siap kembali membangun daerah dengan bekal ilmu dan pengalaman yang telah kami kumpulkan.
+                    Kami bangga menjadi bagian dari IPMAPAN, dan kami yakin, dengan semangat kebersamaan ini, kami akan mampu mewujudkan masa depan yang lebih baik bagi Paniai.
+                </p>
+            </section>
+
+            <section id="profil">
+                <h2>Profil inti pengurus</h2>
+                <div class="profile-item initial-hidden">
+                    <img src="ketuakontrakan.jpg" alt="Zeth Robert Nawipa - Ketua Kontrakan IPMAPAN" class="profile-pic" />
+                    <p>
+                        <strong>Zeth Robert Nawipa</strong> menjabat Ketua Kontrakan IPMAPAN dan menjadi penghubung antar anggota serta koordinator kegiatan harian di kontrakan.
+                    </p>
+                </div>
+                <div class="profile-item initial-hidden">
+                    <img src="bph.jpg" alt="Jami Gobai - Ketua BPH IPMAPAN" class="profile-pic" />
+                    <p>
+                        <strong>Jami Gobai</strong> adalah Ketua BPH (badan pengurus harian)IPMAPAN yang memiliki komitmen tinggi terhadap kemajuan organisasi.
+                    </p>
+                </div>
+                <div class="profile-item initial-hidden">
+                    <img src="Sekretaris.jpg" alt="Alison Agapa - Sekretaris IPMAPAN" class="profile-pic" />
+                    <p>
+                        <strong>Alison Agapa</strong> menjabat sebagai Sekretaris dan berperan penting dalam pencatatan serta dokumentasi kegiatan.
+                    </p>
+                </div>
+                <div class="profile-item initial-hidden">
+                    <img src="bendahra.jpg" alt="Aghasta Gobai - Bendahara IPMAPAN" class="profile-pic" />
+                    <p>
+                        <strong>Aghasta Gobai</strong> sebagai Bendahara mengelola keuangan organisasi dengan transparansi dan akuntabilitas.
+                    </p>
+                </div>
+            </section>
+
+            <section id="pengurus">
+                <h2>Struktur organisasi</h2>
+                <ul>
+                    <li>1. Ketua Kontrakan : Zeth Robert Nawipa</li>
+                    <li>2. Badan Pengurus Harian (BPH) : Jami Gobai</li>
+                    <li>3. Sekretaris : Alison Agapa</li>
+                    <li>4. Bendahara : Aghasta Gobai</li>
+                    <li>5. Pembina : seluruh senioritas IPMAPAN</li>
+                    <li>
+                        6. Seksi pendidikan :
+                        <ul class="sub-list">
+                            <li>- Tehresia Youw</li>
+                            <li>- Kristiano Gobai</li>
+                            <li>- Melkison Kudiai</li>
+                        </ul>
+                        7. Seksi olahraga :
+                        <ul class="sub-list">
+                            <li>- demison Adii</li>
+                            <li>- sefi yosafat degei</li>
+                            <li>- mikhael Gobai</li>
+            </section>
+
+            <section id="kegiatan">
+                <h2>Daftar kegiatan</h2>
+                <ul>
+                    <li>1. Diskusi mingguan</li>
+                    <li>2. Ibadah mingguan</li>
+                    <li>3. Bazar-bazar</li>
+                    <li>4. Ikut pelatihan</li>
+                    <li>5. Ambil penanggung jawab dari kegiatan IPMANAPANDODE</li>
+                </ul>
+            </section>
+
+            <section id="galeri">
+                <h2>Dokumentasi Pemilihan BPH (Badan pengurus harian) 2025/2026</h2>
+                <div class="galeri-container">
+                    <img src="foto (1).jpg" alt="Foto kegiatan pemilihan BPH 1" V class="initial-hidden" />
+                    <img src="foto (2).jpg" alt="Foto kegiatan pemilihan BPH 2" class="initial-hidden" />
+                    <img src="foto (3).jpg" alt="Foto kegiatan pemilihan BPH 3" class="initial-hidden" />
+                    <img src="foto (4).jpg" alt="Foto kegiatan pemilihan BPH 4" class="initial-hidden" />
+                    <img src="foto (5).jpg" alt="Foto kegiatan pemilihan BPH 5" class="initial-hidden" />
+                    <img src="foto (6).jpg" alt="Foto kegiatan pemilihan BPH 6" class="initial-hidden" />
+                    <img src="foto (7).jpg" alt="Foto kegiatan pemilihan BPH 7" class="initial-hidden" />
+                    <img src="foto (8).jpg" alt="Foto kegiatan pemilihan BPH 8" class="initial-hidden" />
+                    <img src="foto (9).jpg" alt="Foto kegiatan pemilihan BPH 9" class="initial-hidden" />
+                    <img src="foto (10).jpg" alt="Foto kegiatan pemilihan BPH 10" class="initial-hidden" />
+                </div>
+            </section>
+
+            <section id="galeri-kami">
+                <h2>Galeri Kami</h2>
+                <p>Dokumentasi kegiatan umum IPMAPAN lainnya.</p>
+                <div class="galeri-container">
+                    <img src="kami1.jpg" alt="Galeri Kami 1" class="initial-hidden" />
+                    <img src="kami2.jpg" alt="Galeri Kami 2" class="initial-hidden" />
+                    <img src="kami3.jpg" alt="Galeri Kami 3" class="initial-hidden" />
+                    <img src="kami4.jpg" alt="Galeri Kami 4" class="initial-hidden" />
+                    <img src="kami5.jpg" alt="Galeri Kami 5" class="initial-hidden" />
+                    <img src="kami6.jpg" alt="Galeri Kami 6" class="initial-hidden" />
+                    <img src="kami7.jpg" alt="Galeri Kami 7" class="initial-hidden" />
+                    <img src="kami8.jpg" alt="Galeri Kami 7" class="initial-hidden" />
+                </div>
+            </section>
+            <section id="kontak">
+                <h2>Kontak</h2>
+                <p>
+                    <i class="fas fa-envelope"></i> Email:
+                    <a href="mailto:ipmapan@example.com">ipmapan@example.com</a>
+                </p>
+                <p>
+                    <i class="fab fa-instagram"></i> Instagram:
+                    <a href="https://instagram.com/ipmapan_official" target="_blank" rel="noopener noreferrer">@ipmapan_official</a
+            >
+          </p>
+          <p>
+            <i class="fab fa-whatsapp"></i> WhatsApp:
+            <a
+              href="https://wa.me/6281234567890?text=Halo,%20saya%20ingin%20bertanya%20tentang%20IPMAPAN."
+              target="_blank"
+              rel="noopener noreferrer"
+              >Hubungi via WhatsApp</a
+            >
+          </p>
+        </section>
+      </main>
+
+      <footer>&copy; 2025 IPMAPAN. Dibuat oleh Gobai Kristiano.</footer>
+    </div>
+    <script>
+      const welcomeScreen = document.getElementById("welcome-screen");
+      const enterButton = document.getElementById("enter-button");
+      const mainContent = document.getElementById("main-content");
+      const sections = document.querySelectorAll("main section"); // Ambil semua section di dalam main
+      const galleryImages = document.querySelectorAll(
+        "#galeri .galeri-container img"
+      ); // Ambil semua gambar di galeri
+      const profileItems = document.querySelectorAll("#profil .profile-item"); // Ambil semua div item profil
+      const kamiImages = document.querySelectorAll(
+        "#galeri-kami .galeri-container img"
+      ); // Ambil semua gambar di galeri kami
+
+      enterButton.addEventListener("click", function () {
+        welcomeScreen.classList.add("hidden");
+        welcomeScreen.addEventListener(
+          "transitionend",
+          function () {
+            welcomeScreen.style.display = "none";
+            mainContent.classList.add("visible");
+            document.body.style.overflowY = "auto"; // Mengizinkan scroll setelah welcome screen
+
+            // Tampilkan section satu per satu
+            sections.forEach((section, index) => {
+              setTimeout(() => {
+                section.classList.add("show-section");
+              }, index * 200); // Setiap section muncul dengan jeda 200ms
+            });
+
+            // Setelah main content visible dan sections mulai muncul,
+            // inisialisasi Intersection Observer
+            // Beri sedikit jeda agar transisi welcome screen selesai dan halaman siap discroll
+            setTimeout(() => {
+              setupScrollAnimations();
+            }, 1000); // Mulai observasi setelah 1 detik
+          },
+          {
+            once: true,
+          }
+        );
+      });
+
+      document.addEventListener("DOMContentLoaded", (event) => {
+        if (welcomeScreen.style.display !== "none") {
+          document.body.style.overflowY = "hidden";
+        }
+
+        // Inisialisasi posisi awal untuk semua elemen yang akan dianimasikan
+        galleryImages.forEach((img, index) => {
+          if (index % 2 === 0) {
+            img.classList.add("initial-hidden", "slide-from-left");
+          } else {
+            img.classList.add("initial-hidden", "slide-from-right");
+          }
+        });
+
+        profileItems.forEach((item, index) => {
+          if (index % 2 === 0) {
+            item.classList.add("initial-hidden", "slide-from-left");
+          } else {
+            item.classList.add("initial-hidden", "slide-from-right");
+          }
+        });
+
+        // Inisialisasi posisi awal untuk gambar galeri kami
+        kamiImages.forEach((img, index) => {
+          if (index % 2 === 0) {
+            img.classList.add("initial-hidden", "slide-from-left");
+          } else {
+            img.classList.add("initial-hidden", "slide-from-right");
+          }
+        });
+      });
+
+      function setupScrollAnimations() {
+        // Options for the Intersection Observer
+        const observerOptions = {
+          root: null, // Use the viewport as the root
+          rootMargin: "0px", // No margin around the root
+          threshold: 0.1, // Trigger when 10% of the item is visible
+        };
+
+        // Callback function for the Intersection Observer
+        const observerCallback = (entries, observer) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const element = entry.target;
+              // Hapus kelas initial-hidden, tambahkan is-visible untuk animasi
+              element.classList.remove("initial-hidden");
+              element.classList.add("is-visible");
+              observer.unobserve(element); // Stop observing once it's animated
+            }
+          });
+        };
+
+        const observer = new IntersectionObserver(
+          observerCallback,
+          observerOptions
+        );
+
+        // Observe all gallery images
+        galleryImages.forEach((img, index) => {
+          img.style.transitionDelay = `${index * 100}ms`; // Tambahkan delay untuk efek muncul berurutan
+          observer.observe(img);
+        });
+
+        // Observe all profile items
+        profileItems.forEach((item, index) => {
+          item.style.transitionDelay = `${index * 100}ms`; // Tambahkan delay untuk efek muncul berurutan
+          observer.observe(item);
+        });
+
+        // Observe all kami images
+        kamiImages.forEach((img, index) => {
+          img.style.transitionDelay = `${index * 100}ms`; // Tambahkan delay untuk efek muncul berurutan
+          observer.observe(img);
+        });
+      }
+    </script>
+  </body>
+</html>
